@@ -8,18 +8,18 @@ import (
 
 // shape of the evt.
 type Event struct {
-	ID          int64     `json:"id"`
+	ID          int64   
 	Name        string    `json:"name" binding:"required"`
 	Description string    `json:"description" binding:"required"`
 	Location    string    `json:"location" binding:"required"`
-	DateTime    time.Time    `json:"dateTime" binding:"required"` // <- changed to string
-	UserId      int       `json:"userId"`
+	DateTime    time.Time  `json:"dateTime" binding:"required"`
+	UserId      int        `json:"userId"`
 }
 
 
-var events = []Event{}
+//var events = []Event{}
 
-func (e Event) Save() error {
+func (e *Event) Save() error {
 
 	query := `INSERT INTO events (name, description, location, dateTime, user_id)
 	          VALUES (?, ?, ?, ?, ?)`
@@ -77,4 +77,21 @@ func GetEventById(id int64)(*Event, error){
 		return nil,err
 	}
 	return  &event,nil
+}
+
+func(e Event) Update()error{
+	query := `
+	UPDATE events
+	SET name = ?, description = ?, location = ?, dateTime = ?
+	WHERE id = ?
+	`
+	stmt,err:=db.DB.Prepare(query)
+	if err != nil{
+		return err
+	}
+	
+	defer stmt.Close()
+
+	_,err= stmt.Exec(e.Name, e.Description, e.Location, e.DateTime, e.ID)
+	return err
 }
