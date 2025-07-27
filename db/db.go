@@ -6,17 +6,18 @@ import (
 	"database/sql"
 	"fmt"
 
-	// _ "github.com/mattn/go-sqlite3"
-    _ "modernc.org/sqlite"
+	_ "github.com/mattn/go-sqlite3"
+    //_ "modernc.org/sqlite"
 )
 
 var DB *sql.DB
  
 func InitDB() {
     var err error
-    DB, err = sql.Open("sqlite", "api.db")
+    DB, err = sql.Open("sqlite3", "api.db")
  
     if err != nil {
+        fmt.Println("ERROR",err)
         panic("Could not connect to database🔴.")
     }
  
@@ -32,6 +33,7 @@ func createTables(){
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     description TEXT NOT NULL,
+    location TEXT NOT NULL,
     dateTime DATETIME NOT NULL,
     user_id INTEGER
     )
