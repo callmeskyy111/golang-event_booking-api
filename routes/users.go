@@ -29,7 +29,7 @@ if err != nil{
 	"message": "User created successfully✅",
 	"success": "true",
 	"user": gin.H{
-		"user_id":    user.Id,
+		"userId":    user.Id,
 		"email": user.Email,
 	},
 })
