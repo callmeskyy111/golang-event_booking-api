@@ -9,5 +9,5 @@ server.GET("/events/:id", GetSingleEvent)
 server.POST("/events", CreateEvent)
 server.PUT("/events/:id",UpdateEvent)
 server.DELETE("/events/:id",DeleteEvent)
-server.POST("/signup")
+server.POST("/signup", SignUp)
 }
