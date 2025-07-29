@@ -41,21 +41,19 @@ func GetEvents(context *gin.Context){
 }
 
 func CreateEvent(ctxt *gin.Context){
-
+	var event models.Event
 	token:= ctxt.Request.Header.Get("Authorization")
 	if token==""{
 		ctxt.JSON(http.StatusUnauthorized, gin.H{"message":"Authorization-Error 🔴", "success":"false"})
 		return
 	}
 
-	err:=utils.VerifyToken(token)
+	userId,err:=utils.VerifyToken(token)
 	if err!=nil{
 		ctxt.JSON(http.StatusUnauthorized, gin.H{"message":"Not Authorized 🔴"})
 		return
 	}
 
-
-	var event models.Event
 	err = ctxt.ShouldBindJSON(&event)
 	if err != nil {
 	fmt.Println("🛑 Bind error:", err)
@@ -65,8 +63,8 @@ func CreateEvent(ctxt *gin.Context){
 	})
 	return
 }
-	
-	event.UserId = 1
+	ctxt.GetInt64("userId")
+	event.UserId = userId
 
 	err = event.Save() //auto-generate id
 
@@ -79,13 +77,15 @@ func CreateEvent(ctxt *gin.Context){
 }
 
 func UpdateEvent(ctxt *gin.Context){
- eventId,err:=strconv.ParseInt(ctxt.Param("id"), 10, 64) 
+  eventId,err:=strconv.ParseInt(ctxt.Param("id"), 10, 64) 
 
 	if err!=nil {
 		ctxt.JSON(http.StatusBadRequest, gin.H{"message":"Could not parse the Event-ID.. Try again later 🔴", "success":"false"})
 		return
 	}
-_,err =models.GetEventById(eventId)
+
+userId:= ctxt.GetInt64("userId")
+event, err :=models.GetEventById(eventId)
 
 if err != nil {
 	if errors.Is(err, sql.ErrNoRows) {
@@ -96,6 +96,12 @@ if err != nil {
 	return
 
 }
+
+if event.UserId != userId{
+ctxt.JSON(http.StatusUnauthorized, gin.H{"message":"Not Authorized To Update Event."})
+return
+}
+
 
 var updatedEvt models.Event
 err = ctxt.ShouldBindJSON(&updatedEvt)
@@ -126,6 +132,7 @@ func DeleteEvent(ctxt *gin.Context){
 		ctxt.JSON(http.StatusBadRequest, gin.H{"message":"Could not parse the Event-ID.. Try again later 🔴", "success":"false"})
 		return
 	}
+userId := ctxt.GetInt64("userId")
 event,err :=models.GetEventById(eventId)
 
 if err != nil {
@@ -138,6 +145,11 @@ if err != nil {
 
 }
 
+if event.UserId != userId{
+ctxt.JSON(http.StatusUnauthorized, gin.H{"message":"Not Authorized To DELETE Event."})
+return
+}
+
 err= event.Delete()
 if err != nil{
 	ctxt.JSON(http.StatusInternalServerError, gin.H{"message": "Could not DELETE the Event 🔴", "success":"false"})
@@ -147,3 +159,4 @@ if err != nil{
 ctxt.JSON(http.StatusOK, gin.H{"message":"Event DELETED Successfully ✅", "success":"true"})
 
 }
+
