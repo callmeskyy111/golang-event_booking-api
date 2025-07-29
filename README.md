@@ -2,7 +2,7 @@
 
 ## 🧩 Golang REST API with JWT Auth & SQLite
 
-This project is a fully functional Event-Registration REST API built with **Go (Golang)** using the **Gin framework**, **JWT-based authentication**, and **SQLite** as the database. It provides secure user authentication and full CRUD functionality for managing events.
+This project is a fully functional Event-Booking REST API built with **Go (Golang)** using the **Gin framework**, **JWT-based authentication**, and **SQLite** as the database. It provides secure user authentication and full CRUD functionality for managing events.
 
 ---
 
