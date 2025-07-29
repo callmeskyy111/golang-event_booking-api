@@ -1,9 +1,10 @@
 POST http://localhost:8080/events
 content-type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImV4YW1wbGVAZXhhbXBsZS5jb20iLCJleHAiOjE3NTM3OTY0MTUsInVzZXJJZCI6MH0.SGguvSTrUC9JBk5kr6tRJnFOogjUA5wDyXYWLTQrng8
 
 {
-    "name":"Test Evt. 3",
-    "description":"A test evt. 3",
+    "name":"Test Evt.",
+    "description":"A test evt",
     "location":"New York City",
     "dateTime":"2025-06-01T15:30:00.000Z"
 

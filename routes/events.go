@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"example.com/rest-api/models"
+	"example.com/rest-api/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -40,9 +41,23 @@ func GetEvents(context *gin.Context){
 }
 
 func CreateEvent(ctxt *gin.Context){
+
+	token:= ctxt.Request.Header.Get("Authorization")
+	if token==""{
+		ctxt.JSON(http.StatusUnauthorized, gin.H{"message":"Authorization-Error 🔴", "success":"false"})
+		return
+	}
+
+	err:=utils.VerifyToken(token)
+	if err!=nil{
+		ctxt.JSON(http.StatusUnauthorized, gin.H{"message":"Not Authorized 🔴"})
+		return
+	}
+
+
 	var event models.Event
-	err := ctxt.ShouldBindJSON(&event)
-if err != nil {
+	err = ctxt.ShouldBindJSON(&event)
+	if err != nil {
 	fmt.Println("🛑 Bind error:", err)
 	ctxt.JSON(http.StatusBadRequest, gin.H{
 		"message": "Could not parse request-data 🔴",
@@ -51,10 +66,9 @@ if err != nil {
 	return
 }
 	
-	//event.ID = 1
 	event.UserId = 1
 
-	err = event.Save()
+	err = event.Save() //auto-generate id
 
 	if err!= nil{
 		ctxt.JSON(http.StatusInternalServerError, gin.H{"message":"Could not create event.. Try again later 🔴", "success":"false"})
