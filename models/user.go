@@ -1,22 +1,25 @@
 package models
 
 import (
+	"errors"
+	"fmt"
+
 	"example.com/rest-api/db"
 	"example.com/rest-api/utils"
 )
 
 // shape of the user.
-type User struct{
-Id int64
-Email string `binding:"required"`
-Password string `binding:"required"`
+type User struct {
+	Id       int64
+	Email    string `binding:"required"`
+	Password string `binding:"required"`
 }
 
+
 func (u *User) Save()error{
-	query:= `INSERT INTO users (email,password)
-	VALUES (?, ?)
-	`
+	query:= "INSERT INTO users (email,password) VALUES (?, ?)"
 	stmt,err:=db.DB.Prepare(query)
+
 	if err!=nil{
 		return  err
 	}
@@ -38,3 +41,31 @@ func (u *User) Save()error{
 	u.Id = userId
 	return err
 }
+
+func (u User) ValidateCredentials()error{
+	query:="SELECT id, password FROM users WHERE email = ?"
+	row := db.DB.QueryRow(query, u.Email)
+
+
+	var retrievedPassword string
+
+	err := row.Scan(&u.Id, &retrievedPassword)
+
+	if err!=nil{
+		return errors.New("credentials invalid")
+	}
+	// fmt.Println("DEBUG - Plain Password:", u.Password)
+	// fmt.Println("DEBUG - Hashed From DB:", string(retrievedPassword))
+
+	 passwordIsValid := utils.CheckPasswordHash(u.Password,retrievedPassword)
+
+	fmt.Println("DEBUG - Password Match Result:", passwordIsValid)
+
+
+	if !passwordIsValid {
+		return  errors.New("credentials invalid")
+	}
+
+	return nil
+}
+
